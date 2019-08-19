@@ -1,0 +1,109 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="XWiki.BlockingAuth.Translations" locale="">
+  <web>XWiki.BlockingAuth</web>
+  <name>Translations</name>
+  <language/>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1552683495000</creationDate>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1552684537000</date>
+  <contentUpdateDate>1552684537000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>admin.blockingauth=Blocking
+blockingauth.missingService=The Blocking Authenticator is not installed.
+blockingauth.admin.heading=Blockages on Failed Logins
+blockingauth.admin.config.subheading=Configuration
+blockingauth.admin.events.subheading=Blocked Users and IPs
+
+blockingauth.admin.events.users.table.user=User
+blockingauth.admin.events.users.table.date=Last Attempt
+blockingauth.admin.events.users.table.actions=Actions
+blockingauth.admin.events.users.empty=There are currently no blocked users.
+blockingauth.admin.events.users.error=An error occurred while fetching the list of blocked users.
+blockingauth.admin.events.users.unblock.success=User {0} unblocked.
+blockingauth.admin.events.users.unblock.error=Error while unblocking user {0}.
+
+blockingauth.admin.events.ips.table.ip=IP
+blockingauth.admin.events.ips.table.date=Last Attempt
+blockingauth.admin.events.ips.table.actions=Actions
+blockingauth.admin.events.ips.empty=There are currently no blocked IPs.
+blockingauth.admin.events.ips.error=An error occurred while fetching the list of blocked IPs.
+blockingauth.admin.events.ips.unblock.success=IP {0} unblocked.
+blockingauth.admin.events.ips.unblock.error=Error while unblocking IP {0}.
+
+blockingauth.admin.config.ipnote=Note: Your request seems to come from the IP {0}.
+
+# config class fields
+XWiki.BlockingAuth.ConfigClass_maxUserAttempts=Maximal number of (consecutive) failed logins before a user is blocked
+XWiki.BlockingAuth.ConfigClass_userBlockTime=Time of blockage after the maximal number of failed logins is reached (in seconds)
+XWiki.BlockingAuth.ConfigClass_maxIPAttempts=Maximal number of failed logins before an IP is blocked
+XWiki.BlockingAuth.ConfigClass_ipBlockTime=Time of blockage after the maximal number of failed logins per IP is reached (in seconds)
+XWiki.BlockingAuth.ConfigClass_ipWhitelist=List of whitelisted IPs, which are never blocked
+XWiki.BlockingAuth.ConfigClass_trustedProxies=List of trusted proxies
+</content>
+  <object>
+    <name>XWiki.BlockingAuth.Translations</name>
+    <number>0</number>
+    <className>XWiki.TranslationDocumentClass</className>
+    <guid>1c8d76c0-6365-45f1-a041-19b59b2b360b</guid>
+    <class>
+      <name>XWiki.TranslationDocumentClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <scope>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>scope</name>
+        <number>1</number>
+        <prettyName>Scope</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>ON_DEMAND|WIKI|USER|GLOBAL</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </scope>
+    </class>
+    <property>
+      <scope>WIKI</scope>
+    </property>
+  </object>
+</xwikidoc>

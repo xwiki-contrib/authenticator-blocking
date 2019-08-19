@@ -1,0 +1,5 @@
+org.xwiki.contrib.authentication.blocking.script.BlockingAuthScriptService
+org.xwiki.contrib.authentication.blocking.internal.DefaultBlockedUserService
+org.xwiki.contrib.authentication.blocking.internal.BlockingAuthConfiguration
+org.xwiki.contrib.authentication.blocking.internal.AuthConfigInitializer
+org.xwiki.contrib.authentication.blocking.internal.AuthConfigEditListener
