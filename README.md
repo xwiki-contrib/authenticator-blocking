@@ -7,7 +7,7 @@ An authenticator which blocks logins after too many failures
 * [Issue Tracker](https://jira.xwiki.org/browse/AUTHBLOCK) 
 * Communication: [Forum](https://dev.xwiki.org/xwiki/bin/view/Community/Discuss), [IRC](https://dev.xwiki.org/xwiki/bin/view/Community/Chat)
 * [Development Practices](https://contrib.xwiki.org/xwiki/bin/view/Main/) 
-* Minimal XWiki version supported: XWiki 9.11.8 
+* Minimal XWiki version supported: XWiki 9.11.4
 * License: LGPL 2.1 
 * Translations: TBD
 * Sonar Dashboard: N/A 
