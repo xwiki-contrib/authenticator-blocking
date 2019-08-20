@@ -37,8 +37,8 @@
   </properties>
   <dependencies>
     <dependency>
-      <groupId>org.xwiki.contrib.auth</groupId>
-      <artifactId>blocking-authenticator-api</artifactId>
+      <groupId>org.xwiki.contrib.authentication</groupId>
+      <artifactId>authenticator-blocking-api</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
