@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.contrib.authentication</groupId>
     <artifactId>authenticator-blocking</artifactId>
-    <version>0.1-SNAPSHOT</version>
+    <version>1.0</version>
   </parent>
   <artifactId>authenticator-blocking-ui</artifactId>
   <name>Blocking Authenticator - UI</name>
