@@ -152,6 +152,7 @@ public class AuthConfigInitializer extends AbstractMandatoryClassInitializer
 
                     defaults.setStringListValue(WHILELISTED_IPS, Arrays.<String>asList());
                     defaults.setStringListValue(TRUSTED_PROXIES, Arrays.asList("127.0.0.1", "[::1]"));
+                    doc.setHidden(true);
                 }
 
                 if (needSave) {
