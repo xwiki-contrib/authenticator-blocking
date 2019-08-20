@@ -63,6 +63,13 @@ $xwiki.ssx.use('XWiki.BlockingAuth.AdminBlockingAuthSheet')
 {{error}}
 $services.localization.render('blockingauth.missingService')
 {{/error}}
+
+#end
+#if(!$services.blockingauth.blockingAuthenticator)
+{{error}}
+$services.localization.render('blockingauth.authNotConfigured')
+{{/error}}
+
 #end
 {{/velocity}}
 

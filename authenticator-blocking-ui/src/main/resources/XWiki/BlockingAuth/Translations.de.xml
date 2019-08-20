@@ -41,6 +41,8 @@
   <hidden>false</hidden>
   <content>admin.blockingauth=Sperren
 blockingauth.missingService=Der "Blocking Authenticator" ist nicht aktiviert.
+blockingauth.authNotConfigured=Der "Blocking Authenticator" ist nicht der in der Konfiguration eingestellte Authentifizierungsservive. \
+ Bitte setzen Sie ##xwiki.authentication.authclass=org.xwiki.contrib.authentication.blocking.internal.BlockingAuthServiceImpl## in der Konfigurationsdatei ##xwiki.cfg##.
 blockingauth.admin.heading=Sperren durch fehlerhafte Loginversuche
 blockingauth.admin.config.subheading=Konfiguration
 blockingauth.admin.events.subheading=Gesperrte Benutzer und IPs

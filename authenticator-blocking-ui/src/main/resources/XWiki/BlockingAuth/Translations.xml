@@ -41,6 +41,8 @@
   <hidden>true</hidden>
   <content>admin.blockingauth=Blocking
 blockingauth.missingService=The Blocking Authenticator is not installed.
+blockingauth.authNotConfigured=The Blocking Authenticator is not the configured authentication service. \
+ Please set ##xwiki.authentication.authclass=org.xwiki.contrib.authentication.blocking.internal.BlockingAuthServiceImpl## in your ##xwiki.cfg##.
 blockingauth.admin.heading=Blockages on Failed Logins
 blockingauth.admin.config.subheading=Configuration
 blockingauth.admin.events.subheading=Blocked Users and IPs
