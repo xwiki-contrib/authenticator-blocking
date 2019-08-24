@@ -32,10 +32,12 @@ import com.xpn.xwiki.user.impl.xwiki.XWikiAuthServiceImpl;
 import com.xpn.xwiki.web.Utils;
 
 /**
- * TBD.
+ * A authentication service that also counts failed logins.
+ * After a configurable number of failures block further login attempts
+ * until no failures have happened for a certain time.
  * 
  * @version $Id$
- * @since 0.1
+ * @since 1.0
  */
 public class BlockingAuthServiceImpl extends XWikiAuthServiceImpl implements XWikiAuthService
 {

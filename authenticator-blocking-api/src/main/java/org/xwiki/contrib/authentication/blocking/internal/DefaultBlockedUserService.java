@@ -49,8 +49,8 @@ import com.xpn.xwiki.web.XWikiRequest;
  * Default implementation for the blocked user service.
  *
  * @version $Id$
- * @since 0.1
- * @see BlockedUsersService
+ * @since 1.0
+ * @see {@link BlockedUsersService}
  */
 @Component(hints = { "default" }, roles = { BlockedUsersService.class })
 @Singleton

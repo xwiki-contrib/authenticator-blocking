@@ -47,7 +47,7 @@ import com.xpn.xwiki.user.api.XWikiRightService;
  * Initializes the config objects.
  * 
  * @version $Id$
- * @since 0.1
+ * @since 1.0
  */
 @Component(roles = {MandatoryDocumentInitializer.class, AuthConfigInitializer.class})
 @Named(AuthConfigInitializer.CLASSNAME)

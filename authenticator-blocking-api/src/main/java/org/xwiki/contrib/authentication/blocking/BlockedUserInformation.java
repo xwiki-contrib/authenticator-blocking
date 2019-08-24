@@ -28,7 +28,7 @@ import org.xwiki.model.reference.DocumentReference;
  * helper class to store information about a blocked user account.
  *
  * @version $Id: $
- * @since 0.1
+ * @since 1.0
  */
 public class BlockedUserInformation
 {

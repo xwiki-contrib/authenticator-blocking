@@ -43,7 +43,7 @@ import com.xpn.xwiki.XWikiContext;
  * Script service to expose data to script and templating languages about blocked users and IPs.
  * 
  * @version $Id$
- * @since 0.1
+ * @since 1.0
  */
 @Component
 @Named("blockingauth")
@@ -79,8 +79,8 @@ public class BlockingAuthScriptService implements ScriptService
     }
 
     /**
-     * @return @code true if the currently configured authentication class is the blocking one.
-     * @since 0.1
+     * @return {@code true} if the currently configured authentication class is the blocking one.
+     * @since 1.0
      */
     public boolean isBlockingAuthenticator()
     {
@@ -204,7 +204,7 @@ public class BlockingAuthScriptService implements ScriptService
      * Get the error generated while performing the previously called action.
      *
      * @return an eventual exception or {@code null} if no exception was thrown
-     * @since 0.1
+     * @since 1.0
      */
     public Exception getError()
     {
@@ -217,7 +217,7 @@ public class BlockingAuthScriptService implements ScriptService
      * @param e
      *            the exception to store, can be {@code null} to clear the previously stored exception
      * @see #getError()
-     * @since 0.1
+     * @since 1.0
      */
     private void setError(Exception e)
     {

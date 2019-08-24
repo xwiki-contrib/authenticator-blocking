@@ -42,7 +42,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * Flushes config in case the config data gets edited.
  * 
  * @version $Id$
- * @since 0.1
+ * @since 1.0
  */
 @Component
 @Named("org.xwiki.contrib.authentication.blocking.internal.AuthConfigEditListener")

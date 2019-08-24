@@ -43,7 +43,7 @@ import com.xpn.xwiki.objects.BaseObject;
  * Provides the blocking auth configuration.
  * 
  * @version $Id$
- * @since 0.1
+ * @since 1.0
  */
 @Component(hints = { "default" }, roles = { BlockingAuthConfiguration.class })
 @Singleton
