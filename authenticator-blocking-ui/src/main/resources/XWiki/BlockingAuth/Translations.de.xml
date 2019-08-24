@@ -65,11 +65,14 @@ blockingauth.admin.events.ips.unblock.error=Beim Entsperren der IP {0} ist ein F
 
 blockingauth.admin.config.ipnote=Hinweis: Ihre Anfrage scheint von der IP {0} zu kommen.
 
+blockingauth.admin.config.noconfig.description=Sie haben für dieses Wiki keine spezielle Konfiguration angelegt. Daher wird das Wiki die Konfiguration vom Hauptwiki verwenden. Wenn Sie dieses Wiki anders konfigurieren möchten, können Sie hier eine neue Konfiguration erzeugen:
+blockingauth.admin.config.create.button=Erzeugen
+
 # config class fields
-XWiki.BlockingAuth.ConfigClass_maxUserAttempts=Maximale Anzahl fehlerhafter Loginversuche, bevor ein Benutzer gesperrt wird
-XWiki.BlockingAuth.ConfigClass_userBlockTime=Zeitraum der Sperrung des Benutzers nach dem letzten fehlerhaften Loginversuch (in Sekunden)
-XWiki.BlockingAuth.ConfigClass_maxIPAttempts=Maximale Anzahl fehlerhafter Loginversuche, bevor eine IP gesperrt wird
-XWiki.BlockingAuth.ConfigClass_ipBlockTime=Zeitraum der Sperrung der IP nach dem letzten fehlerhaften Loginversuch (in Sekunden)
+XWiki.BlockingAuth.ConfigClass_maxUserAttempts=Maximale Anzahl fehlerhafter Login-versuche, bevor ein Benutzer gesperrt wird
+XWiki.BlockingAuth.ConfigClass_userBlockTime=Zeitraum der Sperrung des Benutzers nach dem letzten fehlerhaften Login-versuch (in Sekunden)
+XWiki.BlockingAuth.ConfigClass_maxIPAttempts=Maximale Anzahl fehlerhafter Login-versuche, bevor eine IP gesperrt wird
+XWiki.BlockingAuth.ConfigClass_ipBlockTime=Zeitraum der Sperrung der IP nach dem letzten fehlerhaften Login-versuch (in Sekunden)
 XWiki.BlockingAuth.ConfigClass_ipWhitelist=Liste von IPs, welche niemals gesperrt werden
 XWiki.BlockingAuth.ConfigClass_trustedProxies=Liste von Proxies, denen vertraut wird
 </content>

@@ -32,6 +32,7 @@ import org.xwiki.context.Execution;
 import org.xwiki.contrib.authentication.blocking.BlockedIPInformation;
 import org.xwiki.contrib.authentication.blocking.BlockedUserInformation;
 import org.xwiki.contrib.authentication.blocking.BlockedUsersService;
+import org.xwiki.contrib.authentication.blocking.internal.BlockingAuthConfiguration;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
@@ -62,6 +63,9 @@ public class BlockingAuthScriptService implements ScriptService
 
     @Inject
     private BlockedUsersService blockedUsers;
+
+    @Inject
+    private BlockingAuthConfiguration blockedConfig;
 
     @Inject
     private Provider<ContextualAuthorizationManager> authManagerProvider;
@@ -170,6 +174,30 @@ public class BlockingAuthScriptService implements ScriptService
             setError(e);
         }
         return null;
+    }
+
+    /**
+     * check if we actually have a local config available or inherit it from the main wiki.
+     *
+     * @return true if there is a non-empty config in the cache
+     * @since 1.1
+     */
+    public boolean hasLocalConfig() {
+        return blockedConfig.hasOwnConfig();
+    }
+
+    /**
+     * create a config object for the current wiki.
+     *
+     * if newly created, the configuration will be filled with hard wired default values.
+     * @return true if the configuration was created successfully.
+     * @since 1.1
+     */
+    public boolean createLocalConfig()
+    {
+        return doWithExceptionHandling(() -> {
+            return blockedConfig.createConfig();
+        });
     }
 
     /**

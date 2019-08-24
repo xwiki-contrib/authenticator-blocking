@@ -37,6 +37,7 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.AbstractMandatoryClassInitializer;
+import com.xpn.xwiki.doc.MandatoryDocumentInitializer;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -48,7 +49,7 @@ import com.xpn.xwiki.user.api.XWikiRightService;
  * @version $Id$
  * @since 0.1
  */
-@Component
+@Component(roles = {MandatoryDocumentInitializer.class, AuthConfigInitializer.class})
 @Named(AuthConfigInitializer.CLASSNAME)
 @Singleton
 public class AuthConfigInitializer extends AbstractMandatoryClassInitializer
@@ -132,39 +133,57 @@ public class AuthConfigInitializer extends AbstractMandatoryClassInitializer
         Object context = contextProvider.getContext().getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
         if (context != null && (context instanceof XWikiContext)) {
             XWikiContext xcontext = (XWikiContext) context;
-            XWiki currentWiki = xcontext.getWiki();
-            try {
-                XWikiDocument doc = currentWiki.getDocument(CONFIG_REF, xcontext);
-                boolean needSave = doc.isNew();
-                BaseObject defaults = doc.getXObject(CLASS_REF);
-                if (defaults == null) {
-                    logger.debug("create default configuration for wiki [{}]", currentWiki.getName());
-
-                    doc.createXObject(CLASS_REF, xcontext);
-                    needSave = true;
-                    defaults = doc.getXObject(CLASS_REF);
-
-                    defaults.setIntValue(MAX_USER_ATTEMPTS, 3);
-                    defaults.setLongValue(USER_BLOCK_TIME, 15 * 60L);
-
-                    defaults.setIntValue(MAX_IP_ATTEMPTS, 0);
-                    defaults.setLongValue(IP_BLOCK_TIME, 0L);
-
-                    defaults.setStringListValue(WHILELISTED_IPS, Arrays.<String>asList());
-                    defaults.setStringListValue(TRUSTED_PROXIES, Arrays.asList("127.0.0.1", "[::1]"));
-                    doc.setHidden(true);
-                }
-
-                if (needSave) {
-                    doc.setAuthorReference(new DocumentReference(SUPERADMIN_REF, xcontext.getWikiReference()));
-                    currentWiki.saveDocument(doc, xcontext);
-                }
-            } catch (XWikiException e) {
-                logger.warn("could not initialize default config", e);
+            if (xcontext.isMainWiki()) {
+                createNewConfigObject(xcontext);
             }
         }
 
         return modified;
+    }
+
+    /**
+     * create a new configuration object, if not already present.
+     *
+     * @param context the context of the wiki
+     * @return true if the configuration object was created
+     * @since 1.1
+     */
+    public boolean createNewConfigObject(XWikiContext context)
+    {
+        boolean successfullyCreated = false;
+        XWiki currentWiki = context.getWiki();
+        try {
+            XWikiDocument doc = currentWiki.getDocument(CONFIG_REF, context);
+            boolean needSave = doc.isNew();
+            BaseObject defaults = doc.getXObject(CLASS_REF);
+            if (defaults == null) {
+                logger.debug("create default configuration for wiki [{}]", currentWiki.getName());
+
+                doc.createXObject(CLASS_REF, context);
+                needSave = true;
+                defaults = doc.getXObject(CLASS_REF);
+
+                defaults.setIntValue(MAX_USER_ATTEMPTS, 3);
+                defaults.setLongValue(USER_BLOCK_TIME, 15 * 60L);
+
+                defaults.setIntValue(MAX_IP_ATTEMPTS, 0);
+                defaults.setLongValue(IP_BLOCK_TIME, 0L);
+
+                defaults.setStringListValue(WHILELISTED_IPS, Arrays.<String>asList());
+                defaults.setStringListValue(TRUSTED_PROXIES, Arrays.asList("127.0.0.1", "[::1]"));
+                doc.setHidden(true);
+            }
+
+            if (needSave) {
+                doc.setAuthorReference(
+                    new DocumentReference(SUPERADMIN_REF, context.getWikiReference()));
+                currentWiki.saveDocument(doc, context);
+                successfullyCreated = true;
+            }
+        } catch (XWikiException e) {
+            logger.warn("could not initialize default config", e);
+        }
+        return successfullyCreated;
     }
 
 }

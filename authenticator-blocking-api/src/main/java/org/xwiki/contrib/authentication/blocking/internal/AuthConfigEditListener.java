@@ -77,7 +77,7 @@ public class AuthConfigEditListener extends AbstractEventListener
             DocumentReference configRef = new DocumentReference(AuthConfigInitializer.CONFIG_REF, currentWiki);
 
             if (configRef.equals(currentDocRef)) {
-                config.flushCacheForWiki(currentWiki);
+                config.flushCacheForWiki(context.isMainWiki() ? null : currentWiki);
             }
         }
     }

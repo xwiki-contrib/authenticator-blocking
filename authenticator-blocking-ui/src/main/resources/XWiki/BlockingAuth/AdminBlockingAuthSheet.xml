@@ -28,7 +28,7 @@
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
   <creationDate>1552683195000</creationDate>
-  <parent>xwiki:XWiki.BlockingAuth.WebHome</parent>
+  <parent>XWiki.BlockingAuth.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <date>1552683195000</date>
@@ -130,24 +130,34 @@ $services.localization.render('blockingauth.authNotConfigured')
  #end
 #end
 
-
 {{/velocity}}
 
 == {{velocity}}$services.localization.render('blockingauth.admin.config.subheading'){{/velocity}} ==
 
-{{velocity output="false"}}
-### ToDo: add validation and error handling
+{{velocity}}
+#if($action == "createConfig")
+  #set($discard = $services.blockingauth.createLocalConfig())
+#end
+
+#if($services.blockingauth.hasLocalConfig())
 #set ($params = {
   'settings': ['maxUserAttempts', 'userBlockTime', 'maxIPAttempts', 'ipBlockTime', 'ipWhitelist', 'trustedProxies']
 })
 #set ($paramDoc = $xwiki.getDocument("XWiki.BlockingAuth.Config"))
 #set ($paramClass = "XWiki.BlockingAuth.ConfigClass")
-{{/velocity}}
 
 {{include reference="XWiki.AdminFieldsDisplaySheet"/}}
 
-{{velocity}}
 $services.rendering.escape( $services.localization.render('blockingauth.admin.config.ipnote', [$services.blockingauth.getCurrentIP()] ), $doc.getSyntax() )
+#else
+
+$services.localization.render('blockingauth.admin.config.noconfig.description')
+
+(% class="buttonwrapper" %)(((
+(% class="button" %)
+[[$services.localization.render('blockingauth.admin.config.create.button')&gt;&gt;||queryString="editor=globaladmin&amp;section=blockingauth&amp;action=createConfig"]]
+)))
+#end
 {{/velocity}}
 </content>
   <object>
