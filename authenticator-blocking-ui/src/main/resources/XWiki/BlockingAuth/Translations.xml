@@ -32,7 +32,7 @@
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <date>1552684537000</date>
-  <contentUpdateDate>1552684537000</contentUpdateDate>
+  <contentUpdateDate>1566648588000</contentUpdateDate>
   <version>1.1</version>
   <title>Translations</title>
   <comment/>
@@ -64,6 +64,9 @@ blockingauth.admin.events.ips.unblock.success=IP {0} unblocked.
 blockingauth.admin.events.ips.unblock.error=Error while unblocking IP {0}.
 
 blockingauth.admin.config.ipnote=Note: Your request seems to come from the IP {0}.
+
+blockingauth.admin.config.noconfig.description=You have no special configuration set up for this wiki. The wiki will inherit the configuration settings from the main wiki. If you want to configure this wiki differently, you can create the configuration:
+blockingauth.admin.config.create.button=Create
 
 # config class fields
 XWiki.BlockingAuth.ConfigClass_maxUserAttempts=Maximal number of (consecutive) failed logins before a user is blocked

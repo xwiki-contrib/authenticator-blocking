@@ -27,7 +27,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
  * helper class to store information about a blocked IP.
  *
  * @version $Id: $
- * @since 0.1
+ * @since 1.0
  */
 public class BlockedIPInformation
 {

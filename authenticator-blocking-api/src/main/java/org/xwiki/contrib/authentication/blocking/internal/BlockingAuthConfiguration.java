@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
@@ -42,7 +43,7 @@ import com.xpn.xwiki.objects.BaseObject;
  * Provides the blocking auth configuration.
  * 
  * @version $Id$
- * @since 0.1
+ * @since 1.0
  */
 @Component(hints = { "default" }, roles = { BlockingAuthConfiguration.class })
 @Singleton
@@ -81,6 +82,10 @@ public class BlockingAuthConfiguration
     @Inject
     private Provider<XWikiContext> contextProvider;
 
+    @Inject
+    @Named(AuthConfigInitializer.CLASSNAME)
+    private AuthConfigInitializer configInit;
+
     private Map<String, Config> configCache = new HashMap<>();
 
     /**
@@ -88,65 +93,88 @@ public class BlockingAuthConfiguration
      *
      * @param context
      *            the current context
-     * @return the config as loaded from the database
+     * @return the config as loaded from the current wiki; null if not found
      * @throws XWikiException
      *             if the config could not be loaded
      */
     protected Config loadConfig(XWikiContext context) throws XWikiException
     {
-        Config conf = new Config();
-
         XWikiDocument doc = context.getWiki().getDocument(AuthConfigInitializer.CONFIG_REF, context);
         BaseObject configObj = doc.getXObject(AuthConfigInitializer.CLASS_REF);
 
-        if (configObj != null) {
-            conf.maxUserAttempts = configObj.getIntValue(AuthConfigInitializer.MAX_USER_ATTEMPTS);
-            conf.blockTimeUser = configObj.getLongValue(AuthConfigInitializer.USER_BLOCK_TIME) * 1000L;
-            conf.maxIPAttempts = configObj.getIntValue(AuthConfigInitializer.MAX_IP_ATTEMPTS);
-            conf.blockTimeIP = configObj.getLongValue(AuthConfigInitializer.IP_BLOCK_TIME) * 1000L;
-            conf.whitelistedIPs = asSet(configObj.getListValue(AuthConfigInitializer.TRUSTED_PROXIES));
-            conf.trustedProxies = asSet(configObj.getListValue(AuthConfigInitializer.TRUSTED_PROXIES));
-        } else {
-            throw new XWikiException("could not load mandatory config object from " + doc,
-                new NullPointerException(AuthConfigInitializer.CLASS_REF.toString()));
+        if (configObj == null) {
+            return null;
         }
-
+        Config conf = new Config();
+        conf.maxUserAttempts = configObj.getIntValue(AuthConfigInitializer.MAX_USER_ATTEMPTS);
+        conf.blockTimeUser = configObj.getLongValue(AuthConfigInitializer.USER_BLOCK_TIME) * 1000L;
+        conf.maxIPAttempts = configObj.getIntValue(AuthConfigInitializer.MAX_IP_ATTEMPTS);
+        conf.blockTimeIP = configObj.getLongValue(AuthConfigInitializer.IP_BLOCK_TIME) * 1000L;
+        conf.whitelistedIPs = asSet(configObj.getListValue(AuthConfigInitializer.TRUSTED_PROXIES));
+        conf.trustedProxies = asSet(configObj.getListValue(AuthConfigInitializer.TRUSTED_PROXIES));
+        logger.debug("loaded blocking auth config from wiki [{}]", context.getWikiId());
         return conf;
     }
 
     /**
      * get the auth config for the current wiki.
      *
-     * @return a configuration, never null
+     * @return a configuration, never null, but instead an empty dummy if no values found
      */
     public Config getConfig()
     {
+        return getConfig(contextProvider.get().getWikiId());
+    }
+
+    /**
+     * get the auth config for the given wiki.
+     *
+     * @param wikiId the id of the wiki, should not be null
+     * @return a configuration, never null, but instead an empty dummy if no values found
+     * @since 1.1
+     */
+    public Config getConfig(String wikiId)
+    {
         Config conf;
-        XWikiContext context = contextProvider.get();
-        final String wiki = context.getWikiId();
         synchronized (configCache) {
-            conf = configCache.get(wiki);
+            conf = configCache.get(wikiId);
         }
         if (conf == null) {
-            try {
-                conf = loadConfig(context);
-                synchronized (configCache) {
-                    configCache.put(wiki, conf);
-                }
-            } catch (XWikiException e) {
-                logger.error("could not load config", e);
-                conf = new Config();
-            }
+            final XWikiContext context = contextProvider.get();
 
+            String originalWikiId = context.getWikiId();
+            try {
+                try {
+                    context.setWikiId(wikiId);
+                    conf = loadConfig(context);
+                    if (conf == null && !context.isMainWiki()) {
+                        context.setWikiId(context.getMainXWiki());
+                        conf = loadConfig(context);
+                    }
+                    if (conf == null) {
+                        conf = new Config();
+                    }
+                    synchronized (configCache) {
+                        configCache.put(wikiId, conf);
+                    }
+                    logger.debug("cached blocking auth config for wiki [{}]", wikiId);
+                } catch (XWikiException e) {
+                    logger.error("could not load config", e);
+                    conf = new Config();
+                }
+            } finally {
+                context.setWikiId(originalWikiId);
+            }
         }
         return conf;
     }
+
 
     /**
      * Flush the config cache. The next class to {@link #getConfig()} will load the new values.
      * 
      * @param wiki
-     *            the affected wiki
+     *            the affected wiki; if null then flush cache for all wikis
      */
     public void flushCacheForWiki(WikiReference wiki)
     {
@@ -159,6 +187,48 @@ public class BlockingAuthConfiguration
                 logger.info("cleared config cache for wiki [{}]", wiki.getName());
             }
         }
+    }
+
+    /**
+     * check of the current wiki has its own configuration object.
+     * @return true if the wiki has a config object
+     * @since 1.1
+     */
+    public boolean hasOwnConfig()
+    {
+        try {
+            final XWikiContext context = contextProvider.get();
+            final XWikiDocument doc = context.getWiki().getDocument(AuthConfigInitializer.CONFIG_REF,
+                context);
+            return doc.getXObject(AuthConfigInitializer.CLASS_REF) != null;
+        } catch (XWikiException e) {
+            logger.debug("could not check if config exists", e);
+            return false;
+        }
+    }
+
+    /**
+     * create a new configuration, if not already present.
+     * @return true if a new config was created
+     * @since 1.1
+     */
+    public boolean createConfig()
+    {
+        XWikiContext context = contextProvider.get();
+
+        synchronized (configCache) {
+            try {
+                Config cfg = loadConfig(context);
+                if (cfg != null) {
+                    return false;
+                }
+            } catch (XWikiException e) {
+                logger.info("could not find config for wiki [{}]); will create a new one",
+                    context.getWikiId(), e);
+            }
+        }
+
+        return configInit.createNewConfigObject(context);
     }
 
 

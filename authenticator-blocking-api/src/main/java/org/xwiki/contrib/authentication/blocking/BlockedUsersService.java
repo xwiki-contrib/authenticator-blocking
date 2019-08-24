@@ -27,7 +27,7 @@ import com.xpn.xwiki.XWikiContext;
  * Keeps information about blocked users and IPs.
  * 
  * @version $Id$
- * @since 0.1
+ * @since 1.0
  */
 public interface BlockedUsersService
 {

@@ -6,5 +6,5 @@
 <suppressions>
     <suppress checks="DeclarationOrder"
                  files="AuthConfigInitializer.java"
-                 lines="56-76"/>
+                 lines="57-77"/>
 </suppressions>

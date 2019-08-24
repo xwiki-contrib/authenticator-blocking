@@ -32,6 +32,7 @@ import org.xwiki.context.Execution;
 import org.xwiki.contrib.authentication.blocking.BlockedIPInformation;
 import org.xwiki.contrib.authentication.blocking.BlockedUserInformation;
 import org.xwiki.contrib.authentication.blocking.BlockedUsersService;
+import org.xwiki.contrib.authentication.blocking.internal.BlockingAuthConfiguration;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
@@ -42,7 +43,7 @@ import com.xpn.xwiki.XWikiContext;
  * Script service to expose data to script and templating languages about blocked users and IPs.
  * 
  * @version $Id$
- * @since 0.1
+ * @since 1.0
  */
 @Component
 @Named("blockingauth")
@@ -64,6 +65,9 @@ public class BlockingAuthScriptService implements ScriptService
     private BlockedUsersService blockedUsers;
 
     @Inject
+    private BlockingAuthConfiguration blockedConfig;
+
+    @Inject
     private Provider<ContextualAuthorizationManager> authManagerProvider;
 
     /**
@@ -75,8 +79,8 @@ public class BlockingAuthScriptService implements ScriptService
     }
 
     /**
-     * @return @code true if the currently configured authentication class is the blocking one.
-     * @since 0.1
+     * @return {@code true} if the currently configured authentication class is the blocking one.
+     * @since 1.0
      */
     public boolean isBlockingAuthenticator()
     {
@@ -173,10 +177,34 @@ public class BlockingAuthScriptService implements ScriptService
     }
 
     /**
+     * check if we actually have a local config available or inherit it from the main wiki.
+     *
+     * @return true if there is a non-empty config in the cache
+     * @since 1.1
+     */
+    public boolean hasLocalConfig() {
+        return blockedConfig.hasOwnConfig();
+    }
+
+    /**
+     * create a config object for the current wiki.
+     *
+     * if newly created, the configuration will be filled with hard wired default values.
+     * @return true if the configuration was created successfully.
+     * @since 1.1
+     */
+    public boolean createLocalConfig()
+    {
+        return doWithExceptionHandling(() -> {
+            return blockedConfig.createConfig();
+        });
+    }
+
+    /**
      * Get the error generated while performing the previously called action.
      *
      * @return an eventual exception or {@code null} if no exception was thrown
-     * @since 0.1
+     * @since 1.0
      */
     public Exception getError()
     {
@@ -189,7 +217,7 @@ public class BlockingAuthScriptService implements ScriptService
      * @param e
      *            the exception to store, can be {@code null} to clear the previously stored exception
      * @see #getError()
-     * @since 0.1
+     * @since 1.0
      */
     private void setError(Exception e)
     {

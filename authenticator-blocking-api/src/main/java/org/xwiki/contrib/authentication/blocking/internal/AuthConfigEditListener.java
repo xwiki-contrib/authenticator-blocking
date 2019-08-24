@@ -42,7 +42,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * Flushes config in case the config data gets edited.
  * 
  * @version $Id$
- * @since 0.1
+ * @since 1.0
  */
 @Component
 @Named("org.xwiki.contrib.authentication.blocking.internal.AuthConfigEditListener")
@@ -77,7 +77,7 @@ public class AuthConfigEditListener extends AbstractEventListener
             DocumentReference configRef = new DocumentReference(AuthConfigInitializer.CONFIG_REF, currentWiki);
 
             if (configRef.equals(currentDocRef)) {
-                config.flushCacheForWiki(currentWiki);
+                config.flushCacheForWiki(context.isMainWiki() ? null : currentWiki);
             }
         }
     }
