@@ -70,7 +70,7 @@ public class BlockingAuthServiceImpl extends XWikiAuthServiceImpl implements XWi
 
             if (getService().isIPBlocked(context)) {
                 LOGGER.info("skip login for [{}]; IP [{}] is blocked", username, getService().getCurrentIP());
-                getService().addFailedLogin(null, context);
+                getService().addFailedLogin(username, context);
                 context.put(ERROR_MESSAGE_KEY, "contrib.blockingauth.ip.blocked");
                 return null;
             }
