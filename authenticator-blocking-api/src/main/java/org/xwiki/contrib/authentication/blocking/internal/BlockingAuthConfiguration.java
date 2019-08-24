@@ -123,39 +123,52 @@ public class BlockingAuthConfiguration
      */
     public Config getConfig()
     {
+        return getConfig(contextProvider.get().getWikiId());
+    }
+
+    /**
+     * get the auth config for the given wiki.
+     *
+     * @param wikiId the id of the wiki, should not be null
+     * @return a configuration, never null, but instead an empty dummy if no values found
+     * @since 1.1
+     */
+    public Config getConfig(String wikiId)
+    {
         Config conf;
-        XWikiContext context = contextProvider.get();
-        final String wiki = context.getWikiId();
         synchronized (configCache) {
-            conf = configCache.get(wiki);
+            conf = configCache.get(wikiId);
         }
         if (conf == null) {
+            final XWikiContext context = contextProvider.get();
+
+            String originalWikiId = context.getWikiId();
             try {
-                conf = loadConfig(context);
-                if (conf == null && !context.isMainWiki()) {
-                    String origWikiId = context.getWikiId();
-                    try {
+                try {
+                    context.setWikiId(wikiId);
+                    conf = loadConfig(context);
+                    if (conf == null && !context.isMainWiki()) {
                         context.setWikiId(context.getMainXWiki());
                         conf = loadConfig(context);
-                    } finally {
-                        context.setWikiId(origWikiId);
                     }
-                }
-                if (conf == null) {
+                    if (conf == null) {
+                        conf = new Config();
+                    }
+                    synchronized (configCache) {
+                        configCache.put(wikiId, conf);
+                    }
+                    logger.debug("cached blocking auth config for wiki [{}]", wikiId);
+                } catch (XWikiException e) {
+                    logger.error("could not load config", e);
                     conf = new Config();
                 }
-                synchronized (configCache) {
-                    configCache.put(wiki, conf);
-                }
-                logger.debug("cached blocking auth config for wiki [{}]", context.getWikiId());
-            } catch (XWikiException e) {
-                logger.error("could not load config", e);
-                conf = new Config();
+            } finally {
+                context.setWikiId(originalWikiId);
             }
-
         }
         return conf;
     }
+
 
     /**
      * Flush the config cache. The next class to {@link #getConfig()} will load the new values.

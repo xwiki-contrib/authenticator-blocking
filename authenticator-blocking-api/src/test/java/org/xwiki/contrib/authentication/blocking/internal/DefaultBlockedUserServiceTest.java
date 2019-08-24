@@ -24,6 +24,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.when;
 
 import java.util.HashSet;
@@ -101,7 +102,11 @@ public class DefaultBlockedUserServiceTest
         when(request.getRemoteAddr()).thenReturn(IP_1);
         when(context.getRequest()).thenReturn(request);
         when(context.getWikiReference()).thenReturn(dummyWiki);
+        // we only test for the main wiki
+        when(context.getWikiId()).thenReturn(dummyWiki.getName());
+        when(context.isMainWiki()).thenReturn(true);
         when(configProvider.getConfig()).thenReturn(testConfig);
+        when(configProvider.getConfig(anyString())).thenReturn(testConfig);
         when(contextProvider.get()).thenReturn(context);
     }
 

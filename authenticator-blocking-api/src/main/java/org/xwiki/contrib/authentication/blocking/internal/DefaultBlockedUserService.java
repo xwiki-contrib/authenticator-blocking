@@ -41,6 +41,7 @@ import org.xwiki.contrib.authentication.blocking.BlockedUsersService;
 import org.xwiki.contrib.authentication.blocking.internal.BlockingAuthConfiguration.Config;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.XWikiRequest;
@@ -77,8 +78,8 @@ public class DefaultBlockedUserService implements BlockedUsersService
 
     private final Object lock = new Object();
 
-    private Map<String, List<LoginData>> blockedUsers;
-    private Map<String, List<LoginData>> blockedIps;
+    private Map<String, Map<String, List<LoginData>>> blockedUsers;
+    private Map<String, Map<String, List<LoginData>>> blockedIPs;
 
     @Inject
     private BlockingAuthConfiguration configProvider;
@@ -96,7 +97,7 @@ public class DefaultBlockedUserService implements BlockedUsersService
     public DefaultBlockedUserService()
     {
         blockedUsers = new HashMap<>();
-        blockedIps = new HashMap<>();
+        blockedIPs = new HashMap<>();
     }
 
     @Override
@@ -104,11 +105,44 @@ public class DefaultBlockedUserService implements BlockedUsersService
     {
         LoginData data = new LoginData(username, ip(context));
         synchronized (lock) {
-            addToMap(blockedUsers, data.username, data);
+            addToMap(findWikiMapForUser(username, context), data.username, data);
             if (!whitelistedIp(data.ip)) {
-                addToMap(blockedIps, data.ip, data);
+                addToMap(findMapByWikiId(blockedIPs, context.getWikiId()), data.ip, data);
             }
         }
+    }
+
+    private Map<String, List<LoginData>> findMapByWikiId(Map<String, Map<String, List<LoginData>>> map, String wikiId)
+    {
+        Map<String, List<LoginData>> mapForWiki = map.get(wikiId);
+        if (mapForWiki == null) {
+            mapForWiki = new HashMap<>();
+            map.put(wikiId, mapForWiki);
+        }
+        return mapForWiki;
+    }
+
+    private String findWikiForUser(String username, XWikiContext context)
+    {
+        if (context.isMainWiki()) {
+            return context.getWikiId();
+        }
+        DocumentReference userDoc = new DocumentReference(username,
+            new SpaceReference(XWIKI_SPACE, new WikiReference(context.getWikiId())));
+        if (context.getWiki().exists(userDoc, context)) {
+            return context.getWikiId();
+        }
+        userDoc = userDoc.setWikiReference(new WikiReference(context.getMainXWiki()));
+        if (context.getWiki().exists(userDoc, context)) {
+            return context.getMainXWiki();
+        }
+        return context.getWikiId();
+    }
+
+    private Map<String, List<LoginData>> findWikiMapForUser(String username, XWikiContext context)
+    {
+        String wikiId = findWikiForUser(username, context);
+        return findMapByWikiId(blockedUsers, wikiId);
     }
 
     private static void addToMap(Map<String, List<LoginData>> map, String key, LoginData data)
@@ -116,20 +150,22 @@ public class DefaultBlockedUserService implements BlockedUsersService
         if (key == null) {
             return;
         }
-        List<LoginData> blockedUserList = map.get(key);
-        if (blockedUserList == null) {
-            blockedUserList = new ArrayList<>();
-            map.put(key, blockedUserList);
+        List<LoginData> blockedList = map.get(key);
+        if (blockedList == null) {
+            blockedList = new ArrayList<>();
+            map.put(key, blockedList);
         }
-        blockedUserList.add(data);
+        blockedList.add(data);
     }
 
     @Override
     public boolean isUserBlocked(String username)
     {
-        Config conf = configProvider.getConfig();
+        final XWikiContext context = contextProvider.get();
+        final String wikiId = findWikiForUser(username, context);
+        final Config conf = configProvider.getConfig(wikiId);
         synchronized (lock) {
-            return checkList(blockedUsers.get(username), conf.maxUserAttempts, conf.blockTimeUser);
+            return checkList(blockedUsers.get(wikiId), username, conf.maxUserAttempts, conf.blockTimeUser);
         }
     }
 
@@ -138,7 +174,7 @@ public class DefaultBlockedUserService implements BlockedUsersService
     {
         Config conf = configProvider.getConfig();
         synchronized (lock) {
-            return checkList(blockedIps.get(ip(context)), conf.maxIPAttempts, conf.blockTimeIP);
+            return checkList(blockedIPs.get(context.getWikiId()), ip(context), conf.maxIPAttempts, conf.blockTimeIP);
         }
     }
 
@@ -149,11 +185,20 @@ public class DefaultBlockedUserService implements BlockedUsersService
         final List<BlockedUserInformation> blockedUserInfo = new ArrayList<>();
         final XWikiContext context = contextProvider.get();
         final SpaceReference xwikiSpaceRef = new SpaceReference(XWIKI_SPACE, context.getWikiReference());
+        final Config config = configProvider.getConfig();
+        if (config.maxUserAttempts <= 0) {
+            return blockedUserInfo;
+        }
 
         synchronized (lock) {
-            for (Entry<String, List<LoginData>> entry : blockedUsers.entrySet()) {
+            Map<String, List<LoginData>> blockedUsersForWiki = blockedUsers.get(context.getWikiId());
+            if (blockedUsersForWiki == null) {
+                return blockedUserInfo;
+            }
+
+            for (Entry<String, List<LoginData>> entry : blockedUsersForWiki.entrySet()) {
                 final List<LoginData> loginAttempts = entry.getValue();
-                if (loginAttempts.size() < configProvider.getConfig().maxUserAttempts) {
+                if (loginAttempts.size() < config.maxUserAttempts) {
                     continue;
                 }
                 long lastLoginStamp = 0L;
@@ -190,8 +235,14 @@ public class DefaultBlockedUserService implements BlockedUsersService
     public boolean unblockUser(String userName)
     {
         boolean result;
+        XWikiContext context = contextProvider.get();
         synchronized (lock) {
-            result = blockedUsers.remove(userName) != null;
+            Map<String, List<LoginData>> blockedUsersForWiki = blockedUsers.get(context.getWikiId());
+            if (blockedUsersForWiki == null) {
+                result = false;
+            } else {
+                result = blockedUsersForWiki.remove(userName) != null;
+            }
         }
 
         return result;
@@ -202,11 +253,20 @@ public class DefaultBlockedUserService implements BlockedUsersService
     {
         // TODO: lots of copy & paste from getBlockedUsers
         final List<BlockedIPInformation> blockedIpInfo = new ArrayList<>();
+        Config config = configProvider.getConfig();
+        if (config.maxIPAttempts <= 0) {
+            return blockedIpInfo;
+        }
 
         synchronized (lock) {
-            for (Entry<String, List<LoginData>> entry : blockedIps.entrySet()) {
+            Map<String, List<LoginData>> blockedIpsForWiki = blockedIPs.get(contextProvider.get().getWikiId());
+            if (blockedIpsForWiki == null) {
+                return blockedIpInfo;
+            }
+
+            for (Entry<String, List<LoginData>> entry : blockedIpsForWiki.entrySet()) {
                 final List<LoginData> loginAttempts = entry.getValue();
-                if (loginAttempts.size() < configProvider.getConfig().maxIPAttempts) {
+                if (loginAttempts.size() < config.maxIPAttempts) {
                     continue;
                 }
                 long lastLoginStamp = 0L;
@@ -242,10 +302,15 @@ public class DefaultBlockedUserService implements BlockedUsersService
     public boolean unblockIP(String ip)
     {
         boolean result;
+        XWikiContext context = contextProvider.get();
         synchronized (lock) {
-            result = blockedIps.remove(ip) != null;
+            Map<String, List<LoginData>> blockedIPsForWiki = blockedIPs.get(context.getWikiId());
+            if (blockedIPsForWiki == null) {
+                result = false;
+            } else {
+                result = blockedIPsForWiki.remove(ip) != null;
+            }
         }
-
         return result;
     }
 
@@ -259,11 +324,16 @@ public class DefaultBlockedUserService implements BlockedUsersService
         return ip(context);
     }
 
-    private boolean checkList(List<LoginData> list, int maxAttempts, long blockTime)
+    private boolean checkList(Map<String, List<LoginData>> map, String key, int maxAttempts, long blockTime)
     {
         if (maxAttempts <= 0) {
             return false;
         }
+        if (map == null) {
+            return false;
+        }
+
+        List<LoginData> list = map.get(key);
         if (list == null || list.isEmpty()) {
             return false;
         }
