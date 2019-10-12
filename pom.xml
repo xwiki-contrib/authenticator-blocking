@@ -29,7 +29,7 @@
   </parent>
   <groupId>org.xwiki.contrib.authentication</groupId>
   <artifactId>authenticator-blocking</artifactId>
-  <version>1.2-SNAPSHOT</version>
+  <version>1.2</version>
   <name>Blocking Authenticator - Parent POM</name>
   <description>An authenticator which blocks logins after too many failures</description>
   <packaging>pom</packaging>
@@ -109,6 +109,6 @@
     <connection>scm:git:git://github.com/xwiki-contrib/authenticator-blocking.git</connection>
     <developerConnection>scm:git:git@github.com:xwiki-contrib/authenticator-blocking.git</developerConnection>
     <url>https://github.com/xwiki-contrib/authenticator-blocking/tree/master</url>
-    <tag>authenticator-blocking-1.0</tag>
+    <tag>authenticator-blocking-1.2</tag>
   </scm>
 </project>
