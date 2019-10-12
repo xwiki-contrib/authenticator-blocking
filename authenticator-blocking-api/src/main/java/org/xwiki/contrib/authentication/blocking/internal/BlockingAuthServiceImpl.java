@@ -21,6 +21,7 @@ package org.xwiki.contrib.authentication.blocking.internal;
 
 import java.security.Principal;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.contrib.authentication.blocking.BlockedUsersService;
@@ -56,7 +57,7 @@ public class BlockingAuthServiceImpl extends XWikiAuthServiceImpl implements XWi
     public Principal authenticate(String username, String password, XWikiContext context) throws XWikiException
     {
 
-        if (username != null) {
+        if (!StringUtils.isEmpty(username)) {
             if (LOGGER.isTraceEnabled()) {
                 LOGGER.trace("Starting authentication");
             }
@@ -78,7 +79,7 @@ public class BlockingAuthServiceImpl extends XWikiAuthServiceImpl implements XWi
 
         Principal principal = super.authenticate(username, password, context);
 
-        if (username != null) {
+        if (!StringUtils.isEmpty(username)) {
             if (principal == null) {
                 LOGGER.debug("add login failure for user [{}] and IP [{}]", username, getService().getCurrentIP());
                 getService().addFailedLogin(username, context);
