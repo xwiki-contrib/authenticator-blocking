@@ -49,7 +49,7 @@ $xwiki.ssx.use('XWiki.BlockingAuth.AdminBlockingAuthSheet')
   #if($exception == $NULL)
     {{error}} $services.rendering.escape($msg, $doc.getSyntax()) {{/error}}
   #else
-    #displayException($msg $exception)
+    {{html}} #displayException($msg $exception) {{/html}}
   #end
 
 #end
