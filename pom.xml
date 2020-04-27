@@ -35,7 +35,6 @@
   <packaging>pom</packaging>
 
   <properties>
-    <!-- xwiki.release.jira.skip>false</xwiki.release.jira.skip -->
     <xwiki.issueManagement.jira.id>AUTHBLOCK</xwiki.issueManagement.jira.id>
   </properties>
 
@@ -109,6 +108,6 @@
     <connection>scm:git:git://github.com/xwiki-contrib/authenticator-blocking.git</connection>
     <developerConnection>scm:git:git@github.com:xwiki-contrib/authenticator-blocking.git</developerConnection>
     <url>https://github.com/xwiki-contrib/authenticator-blocking/tree/master</url>
-    <tag>authenticator-blocking-1.0</tag>
+    <tag>HEAD</tag>
   </scm>
 </project>
