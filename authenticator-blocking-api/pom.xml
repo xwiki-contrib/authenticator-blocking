@@ -32,7 +32,7 @@
   <description>An authenticator which blocks logins after too many failures</description>
   <properties>
     <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>Blocking Authenticator - API</xwiki.extension.name>
+    <xwiki.extension.name>Blocking Authenticator</xwiki.extension.name>
     <!-- test code coverage: not great but more that nothing. Also some parts like the class loading listener are hard to test -->
     <xwiki.jacoco.instructionRatio>0.36</xwiki.jacoco.instructionRatio>
   </properties>
