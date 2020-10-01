@@ -33,6 +33,7 @@
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Blocking Authenticator</xwiki.extension.name>
+    <xwiki.extension.category>authenticator</xwiki.extension.category>
     <!-- test code coverage: not great but more that nothing. Also some parts like the class loading listener are hard to test -->
     <xwiki.jacoco.instructionRatio>0.36</xwiki.jacoco.instructionRatio>
   </properties>
