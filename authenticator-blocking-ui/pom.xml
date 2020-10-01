@@ -33,7 +33,7 @@
   <description>UI for the blocking authenticator to configure blocking criteria and manage blocked users</description>
   <properties>
     <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>Blocking Authenticator - UI</xwiki.extension.name>
+    <xwiki.extension.name>Blocking Authenticator UI</xwiki.extension.name>
   </properties>
   <dependencies>
     <dependency>
